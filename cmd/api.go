@@ -46,6 +46,8 @@ func (app *app) mount() http.Handler {
 	productsHandler := products.NewHandler(productService)
 	r.Get("/products", productsHandler.ListProducts)
 
+	r.Get("/products/{id}", productsHandler.GetProductByID)
+
 	return r
 }
 
