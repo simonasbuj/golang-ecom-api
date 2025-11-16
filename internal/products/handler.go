@@ -2,6 +2,7 @@ package products
 
 import (
 	"golang-ecom-api/internal/products/json"
+	"log"
 	"net/http"
 )
 
@@ -15,7 +16,14 @@ func NewHandler(svc Service) *handler {
 	}
 }
 
-func (h *handler) GetProducts(w http.ResponseWriter, r *http.Request) {
+func (h *handler) ListProducts(w http.ResponseWriter, r *http.Request) {
+	err := h.svc.ListProducts(r.Context())
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	products := struct {
 		Products []string `json:"products"`
 	}{

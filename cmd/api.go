@@ -16,7 +16,8 @@ type config struct {
 }
 
 type dbConfig struct {
-	dsn string
+	dbType 	string
+	dsn 	string
 }
 
 type app struct {
@@ -37,8 +38,9 @@ func (app *app) mount() http.Handler {
 		w.Write([]byte("healthy boi"))
 	})
 
-	productsHandler := products.NewHandler(nil)
-	r.Get("/products", productsHandler.GetProducts)
+	productService := products.NewService()
+	productsHandler := products.NewHandler(productService)
+	r.Get("/products", productsHandler.ListProducts)
 
 	return r
 }
