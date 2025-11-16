@@ -1,6 +1,8 @@
 package main
 
 import (
+	"database/sql"
+	repo "golang-ecom-api/internal/adapters/sqlite/sqlc"
 	"golang-ecom-api/internal/products"
 	"log"
 	"net/http"
@@ -16,11 +18,13 @@ type config struct {
 }
 
 type dbConfig struct {
-	dsn string
+	dbType string
+	dsn    string
 }
 
 type app struct {
-	config config
+	config 	config
+	db		*sql.DB	
 }
 
 func (app *app) mount() http.Handler {
@@ -37,8 +41,12 @@ func (app *app) mount() http.Handler {
 		w.Write([]byte("healthy boi"))
 	})
 
-	productsHandler := products.NewHandler(nil)
-	r.Get("/products", productsHandler.GetProducts)
+	querier := 	repo.New(app.db)
+	productService := products.NewService(querier)
+	productsHandler := products.NewHandler(productService)
+	r.Get("/products", productsHandler.ListProducts)
+
+	r.Get("/products/{id}", productsHandler.GetProductByID)
 
 	return r
 }
