@@ -1,0 +1,26 @@
+version: "2"
+run:
+  tests: true
+  
+linters:
+  default: none
+  enable:
+    - govet
+    - staticcheck
+    - ineffassign
+    - unused
+    - gocyclo
+    - bodyclose
+    - forbidigo
+    - misspell
+formatters:
+  default: all
+  enable:
+    # - gci # not compatible with goimports and gofumpt, tries to change imports in different way.
+    - gofmt
+    - gofumpt
+    - goimports
+    - golines
+  exclusions:
+    generated: lax
+    
