@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	repo "golang-ecom-api/internal/adapters/sqlite/sqlc"
 	"log/slog"
 	"os"
 
@@ -36,6 +37,8 @@ func main() {
 		slog.Error("failed to ping database", "error", err)
 		os.Exit(1)
 	}
+
+	_ = repo.New(db)
 
 	err = app.run(app.mount())
 	if err != nil {
