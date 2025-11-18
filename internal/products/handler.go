@@ -10,9 +10,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-var (
-	errProductIdNotProvided = errors.New("product id not provided in url")
-)
+var errProductIdNotProvided = errors.New("product id not provided in url")
 
 type handler struct {
 	svc Service

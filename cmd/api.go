@@ -23,8 +23,8 @@ type dbConfig struct {
 }
 
 type app struct {
-	config 	config
-	db		*sql.DB	
+	config config
+	db     *sql.DB
 }
 
 func (app *app) mount() http.Handler {
@@ -41,7 +41,7 @@ func (app *app) mount() http.Handler {
 		w.Write([]byte("healthy boi"))
 	})
 
-	querier := 	repo.New(app.db)
+	querier := repo.New(app.db)
 	productService := products.NewService(querier)
 	productsHandler := products.NewHandler(productService)
 	r.Get("/products", productsHandler.ListProducts)

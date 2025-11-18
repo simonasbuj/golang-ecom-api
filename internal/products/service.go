@@ -11,7 +11,7 @@ type Service interface {
 	GetProductByID(ctx context.Context, id int64) (*repo.Product, error)
 }
 
-type service struct{
+type service struct {
 	repo repo.Querier
 }
 

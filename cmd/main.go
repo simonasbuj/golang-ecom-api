@@ -36,7 +36,7 @@ func main() {
 
 	app := &app{
 		config: cfg,
-		db: db,
+		db:     db,
 	}
 
 	err = app.run(app.mount())
