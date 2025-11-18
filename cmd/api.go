@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	repo "golang-ecom-api/internal/adapters/sqlite/sqlc"
+	"golang-ecom-api/internal/orders"
 	"golang-ecom-api/internal/products"
 	"log"
 	"net/http"
@@ -44,9 +45,13 @@ func (app *app) mount() http.Handler {
 	querier := repo.New(app.db)
 	productService := products.NewService(querier)
 	productsHandler := products.NewHandler(productService)
-	r.Get("/products", productsHandler.ListProducts)
 
+	r.Get("/products", productsHandler.ListProducts)
 	r.Get("/products/{id}", productsHandler.GetProductByID)
+
+	ordersService := orders.NewService(querier, app.db)
+	ordersHandler := orders.NewHandler(ordersService)
+	r.Post("/orders", ordersHandler.PlaceOrder)
 
 	return r
 }

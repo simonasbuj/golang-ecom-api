@@ -12,3 +12,14 @@ lint-fix:
 .PHONY: test
 test:
 	go test -v ./...
+
+
+# database
+up:
+	goose up
+
+down:
+	goose down
+
+sqlc-generate:
+	sqlc generate
