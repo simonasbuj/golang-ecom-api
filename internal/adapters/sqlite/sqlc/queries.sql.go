@@ -9,9 +9,55 @@ import (
 	"context"
 )
 
+const createOrder = `-- name: CreateOrder :one
+INSERT INTO orders (
+    customer_id
+) VALUES (?) RETURNING id, customer_id, created_at
+`
+
+func (q *Queries) CreateOrder(ctx context.Context, customerID int64) (Order, error) {
+	row := q.db.QueryRowContext(ctx, createOrder, customerID)
+	var i Order
+	err := row.Scan(&i.ID, &i.CustomerID, &i.CreatedAt)
+	return i, err
+}
+
+const createOrderItem = `-- name: CreateOrderItem :one
+INSERT INTO order_items (
+    order_id,
+    product_id,
+    quantity,
+    price_in_cents
+) VALUES (?, ?, ?, ?) RETURNING id, order_id, product_id, quantity, price_in_cents
+`
+
+type CreateOrderItemParams struct {
+	OrderID      int64 `json:"order_id"`
+	ProductID    int64 `json:"product_id"`
+	Quantity     int64 `json:"quantity"`
+	PriceInCents int64 `json:"price_in_cents"`
+}
+
+func (q *Queries) CreateOrderItem(ctx context.Context, arg CreateOrderItemParams) (OrderItem, error) {
+	row := q.db.QueryRowContext(ctx, createOrderItem,
+		arg.OrderID,
+		arg.ProductID,
+		arg.Quantity,
+		arg.PriceInCents,
+	)
+	var i OrderItem
+	err := row.Scan(
+		&i.ID,
+		&i.OrderID,
+		&i.ProductID,
+		&i.Quantity,
+		&i.PriceInCents,
+	)
+	return i, err
+}
+
 const getProductByID = `-- name: GetProductByID :one
-SELECT id, name, price_in_cents, quantity, created_at FROM products
-WHERE id = ?
+SELECT id, name, price_in_cents, quantity, created_at FROM products WHERE id = ?
 `
 
 func (q *Queries) GetProductByID(ctx context.Context, id int64) (Product, error) {
@@ -58,4 +104,20 @@ func (q *Queries) ListProducts(ctx context.Context) ([]Product, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateProductQuantity = `-- name: UpdateProductQuantity :exec
+UPDATE products
+SET quantity = ?
+WHERE id = ?
+`
+
+type UpdateProductQuantityParams struct {
+	Quantity int64 `json:"quantity"`
+	ID       int64 `json:"id"`
+}
+
+func (q *Queries) UpdateProductQuantity(ctx context.Context, arg UpdateProductQuantityParams) error {
+	_, err := q.db.ExecContext(ctx, updateProductQuantity, arg.Quantity, arg.ID)
+	return err
 }
